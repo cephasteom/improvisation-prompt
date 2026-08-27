@@ -8,13 +8,28 @@ const MODES = [
   // other common scales
   'pentatonic', 'min pentatonic'
 ];
-const QUALITIES = ['', 'm'] as const
+const CHORD_TYPES = [
+  // triads
+  '', 'm', 'dim', 'aug', 'sus2', 'sus4',
+  // sixths
+  '6', 'm6', '6/9',
+  // sevenths
+  'maj7', '7', 'm7', 'm#7', 'm7b5', 'dim7',
+  // ninths
+  'maj9', '9', 'm9', 'add9',
+  // elevenths
+  'maj11', '11', 'm11',
+  // thirteenths
+  'maj13', '13', 'm13',
+  // altered dominants
+  '7b5', '7#5', '7b9', '7#9', '7#11', '7b13', '7alt'
+]
 
-const DEFAULT_LENGTH = 12
 
 export type PatternMode = 'scale' | 'chord'
 
-const DEFAULT_MODE: PatternMode = 'scale'
+const DEFAULT_LENGTH = 12
+const DEFAULT_MODE: PatternMode = 'chord'
 
 export interface ChordPatternOptions {
   /** Number of chords in the generated pattern. Defaults to 12. */
@@ -31,15 +46,13 @@ export class ChordPatternGenerator {
     return Array.from({ length }, () => randomPrompt.call(this))
   }
 
-  // Each prompt independently rolls sharp-vs-flat spelling, so the chord root and bass root
-  // within one prompt always share a spelling, while different prompts in the same pattern
-  // can differ.
+  // Each prompt independently rolls sharp-vs-flat spelling, so different prompts in the same
+  // pattern can differ.
   private randomChordPrompt(): string {
     const notes = Math.random() < 0.5 ? SHARP_NOTES : FLAT_NOTES
-    const chordRoot = this.pick(notes)
-    const quality = this.pick(QUALITIES)
-    const bassRoot = this.pick(notes)
-    return `${chordRoot}${quality} / ${bassRoot}`
+    const root = this.pick(notes)
+    const type = this.pick(CHORD_TYPES)
+    return `${root}${type}`
   }
 
   private randomScalePrompt(): string {
