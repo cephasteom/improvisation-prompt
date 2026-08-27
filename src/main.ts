@@ -371,3 +371,6 @@ for (const eventName of ['mousemove', 'touchstart', 'touchmove', 'click']) {
 }
 
 showSidebar()
+
+const footerYearEl = document.querySelector<HTMLSpanElement>('#footer-year')!
+footerYearEl.textContent = String(new Date().getFullYear())

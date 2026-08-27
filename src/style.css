@@ -359,6 +359,26 @@ body {
   color: #000;
 }
 
+.footer {
+  position: fixed;
+  right: 12px;
+  bottom: 8px;
+  color: #555;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  z-index: 5;
+}
+
+.footer-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: #999;
+  text-decoration: underline;
+}
+
 /* Portrait viewports (height > width): stack the cards in a column and scroll
    bottom-to-top instead of the default left-to-right landscape layout. */
 @media (orientation: portrait) {
