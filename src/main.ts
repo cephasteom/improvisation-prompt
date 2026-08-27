@@ -242,11 +242,22 @@ document.addEventListener('keydown', (event) => {
 })
 
 const playStopBtn = document.querySelector<HTMLButtonElement>('#play-stop-btn')!
+const playIconEl = playStopBtn.querySelector<SVGElement>('.icon-play')!
+const stopIconEl = playStopBtn.querySelector<SVGElement>('.icon-stop')!
+const playStopLabelEl = document.querySelector<HTMLSpanElement>('#play-stop-label')!
 let isPlaying = true
+
+function updatePlayStopButton() {
+  const label = isPlaying ? 'Stop' : 'Play'
+  playIconEl.classList.toggle('hidden', isPlaying)
+  stopIconEl.classList.toggle('hidden', !isPlaying)
+  playStopLabelEl.textContent = label
+  playStopBtn.title = label
+}
 
 playStopBtn.addEventListener('click', () => {
   isPlaying = !isPlaying
-  playStopBtn.textContent = isPlaying ? 'Stop' : 'Play'
+  updatePlayStopButton()
 
   if (!isPlaying) {
     resetToFirstCard()
