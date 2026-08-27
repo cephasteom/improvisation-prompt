@@ -39,6 +39,7 @@ body {
 }
 
 .card {
+  padding: 1rem;
   flex: 0 0 auto;
   width: var(--card-w);
   box-sizing: border-box;
