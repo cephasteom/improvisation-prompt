@@ -272,6 +272,50 @@ body {
   font-style: italic;
 }
 
+.settings-field {
+  margin-bottom: 16px;
+}
+
+.settings-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.segmented-control {
+  display: flex;
+  border: 1px solid #555;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segmented-btn {
+  flex: 1;
+  padding: 0.5em 0.8em;
+  border: none;
+  border-right: 1px solid #555;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.segmented-btn:last-child {
+  border-right: none;
+}
+
+.segmented-btn:hover {
+  background: #1a1a1a;
+}
+
+.segmented-btn[aria-checked="true"] {
+  background: #fff;
+  color: #000;
+}
+
 /* Portrait viewports (height > width): stack the cards in a column and scroll
    bottom-to-top instead of the default left-to-right landscape layout. */
 @media (orientation: portrait) {

@@ -1,8 +1,8 @@
 import './style.css'
-import { ChordPatternGenerator } from './chordPatternGenerator.ts'
+import { ChordPatternGenerator, type PatternMode } from './chordPatternGenerator.ts'
 import { deleteChordList, getSavedChordLists, saveChordList, type SavedChordList } from './storage.ts'
+import { getSettings, saveSettings, MAX_LENGTH, MIN_LENGTH, type ChordPatternSettings } from './settings.ts'
 
-const CARD_COUNT = 12
 const CYCLE_SECONDS = 16
 const FLASH_START_SECOND = CYCLE_SECONDS - 3
 const FLASH_DURATION_MS = 150
@@ -11,7 +11,12 @@ const SIDEBAR_HIDE_DELAY_MS = 4000
 
 const chordPatternGenerator = new ChordPatternGenerator()
 
-const prompts = chordPatternGenerator.generate({ length: CARD_COUNT })
+// Current settings and the pattern length derived from them. Both are reassigned by
+// applySettings() when the user saves changes in the settings modal.
+let settings = getSettings()
+let CARD_COUNT = settings.length
+
+const prompts = chordPatternGenerator.generate({ length: CARD_COUNT, mode: settings.mode })
 
 function wrap(index: number): number {
   return ((index % CARD_COUNT) + CARD_COUNT) % CARD_COUNT
@@ -116,11 +121,18 @@ function resetToFirstCard() {
 
 function regenerate() {
   cancelSlide()
-  prompts.splice(0, prompts.length, ...chordPatternGenerator.generate({ length: CARD_COUNT }))
+  prompts.splice(0, prompts.length, ...chordPatternGenerator.generate({ length: CARD_COUNT, mode: settings.mode }))
   currentIndex = 0
   elapsedSeconds = 0
   renderInitial()
   reflowTrack()
+}
+
+function applySettings(newSettings: ChordPatternSettings) {
+  settings = newSettings
+  saveSettings(settings)
+  CARD_COUNT = settings.length
+  regenerate()
 }
 
 function loadChordList(list: SavedChordList) {
@@ -235,10 +247,58 @@ loadBtn.addEventListener('click', () => {
 loadCancelBtn.addEventListener('click', () => closeModal(loadModalOverlay))
 dismissOnBackdropClick(loadModalOverlay)
 
+const settingsModalOverlay = document.querySelector<HTMLDivElement>('#settings-modal-overlay')!
+const settingsBtn = document.querySelector<HTMLButtonElement>('#settings-btn')!
+const settingsCancelBtn = document.querySelector<HTMLButtonElement>('#settings-cancel-btn')!
+const settingsConfirmBtn = document.querySelector<HTMLButtonElement>('#settings-confirm-btn')!
+const modeChordBtn = document.querySelector<HTMLButtonElement>('#mode-chord-btn')!
+const modeScaleBtn = document.querySelector<HTMLButtonElement>('#mode-scale-btn')!
+const lengthInput = document.querySelector<HTMLInputElement>('#length-input')!
+
+// Mode selected in the (still-open, unsaved) settings modal.
+let pendingMode: PatternMode = settings.mode
+
+function renderModeButtons() {
+  modeChordBtn.setAttribute('aria-checked', String(pendingMode === 'chord'))
+  modeScaleBtn.setAttribute('aria-checked', String(pendingMode === 'scale'))
+}
+
+modeChordBtn.addEventListener('click', () => {
+  pendingMode = 'chord'
+  renderModeButtons()
+})
+modeScaleBtn.addEventListener('click', () => {
+  pendingMode = 'scale'
+  renderModeButtons()
+})
+
+settingsBtn.addEventListener('click', () => {
+  pendingMode = settings.mode
+  renderModeButtons()
+  lengthInput.value = String(settings.length)
+  openModal(settingsModalOverlay)
+})
+
+settingsCancelBtn.addEventListener('click', () => closeModal(settingsModalOverlay))
+dismissOnBackdropClick(settingsModalOverlay)
+
+function confirmSettings() {
+  const parsedLength = Math.round(Number(lengthInput.value))
+  const length = Number.isFinite(parsedLength)
+    ? Math.min(MAX_LENGTH, Math.max(MIN_LENGTH, parsedLength))
+    : settings.length
+
+  applySettings({ length, mode: pendingMode })
+  closeModal(settingsModalOverlay)
+}
+
+settingsConfirmBtn.addEventListener('click', confirmSettings)
+
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape') return
   closeModal(saveModalOverlay)
   closeModal(loadModalOverlay)
+  closeModal(settingsModalOverlay)
 })
 
 const playStopBtn = document.querySelector<HTMLButtonElement>('#play-stop-btn')!
