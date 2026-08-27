@@ -17,45 +17,6 @@ function wrap(index: number): number {
   return ((index % CARD_COUNT) + CARD_COUNT) % CARD_COUNT
 }
 
-const appEl = document.querySelector<HTMLDivElement>('#app')!
-appEl.innerHTML = `
-  <aside class="sidebar" id="sidebar">
-    <button type="button" class="sidebar-btn" id="regenerate-btn">Regenerate</button>
-    <button type="button" class="sidebar-btn" id="save-btn">Save</button>
-    <button type="button" class="sidebar-btn" id="load-btn">Load</button>
-    <button type="button" class="sidebar-btn" id="play-stop-btn">Stop</button>
-  </aside>
-  <div class="stage">
-    <div class="track" id="track">
-      <div class="card"></div>
-      <div class="card"></div>
-      <div class="card"></div>
-      <div class="card"></div>
-    </div>
-  </div>
-
-  <div class="modal-overlay hidden" id="save-modal-overlay">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
-      <h2 id="save-modal-title">Save chord list</h2>
-      <input type="text" class="modal-input" id="save-name-input" placeholder="Name" maxlength="60" />
-      <div class="modal-actions">
-        <button type="button" class="modal-btn" id="save-cancel-btn">Cancel</button>
-        <button type="button" class="modal-btn modal-btn-primary" id="save-confirm-btn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay hidden" id="load-modal-overlay">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="load-modal-title">
-      <h2 id="load-modal-title">Load chord list</h2>
-      <ul class="saved-list" id="saved-list"></ul>
-      <div class="modal-actions">
-        <button type="button" class="modal-btn" id="load-cancel-btn">Cancel</button>
-      </div>
-    </div>
-  </div>
-`
-
 const trackEl = document.querySelector<HTMLDivElement>('#track')!
 
 // Always holds, in DOM/visual order: [previous, current, next, incoming (clipped offstage)].
