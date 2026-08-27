@@ -1,8 +1,11 @@
-const STORAGE_KEY = 'improv-prompt:saved-lists'
+import { isChordPatternSettings, type ChordPatternSettings } from './settings.ts'
+
+const STORAGE_KEY = 'improvise:saved-patterns'
 
 export interface SavedChordList {
   name: string
   prompts: string[]
+  settings: ChordPatternSettings
 }
 
 function isSavedChordList(value: unknown): value is SavedChordList {
@@ -10,7 +13,8 @@ function isSavedChordList(value: unknown): value is SavedChordList {
     typeof value === 'object' &&
     value !== null &&
     typeof (value as SavedChordList).name === 'string' &&
-    Array.isArray((value as SavedChordList).prompts)
+    Array.isArray((value as SavedChordList).prompts) &&
+    isChordPatternSettings((value as SavedChordList).settings)
   )
 }
 
@@ -34,10 +38,10 @@ export function getSavedChordLists(): SavedChordList[] {
 }
 
 // Overwrites any existing saved list with the same name.
-export function saveChordList(name: string, prompts: string[]): void {
+export function saveChordList(name: string, prompts: string[], settings: ChordPatternSettings): void {
   const lists = readAll()
   const existingIndex = lists.findIndex((list) => list.name === name)
-  const entry: SavedChordList = { name, prompts: [...prompts] }
+  const entry: SavedChordList = { name, prompts: [...prompts], settings: { ...settings } }
 
   if (existingIndex >= 0) {
     lists[existingIndex] = entry

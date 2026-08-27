@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>improv-prompt</title>
+    <title>Improvise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="app">
@@ -59,7 +65,16 @@
 
       <div class="modal-overlay hidden" id="save-modal-overlay">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
-          <h2 id="save-modal-title">Save chord list</h2>
+          <div class="modal-header">
+            <h2 id="save-modal-title">Save pattern</h2>
+            <button type="button" class="modal-close-btn" id="save-close-btn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span class="visually-hidden">Close</span>
+            </button>
+          </div>
           <input type="text" class="modal-input" id="save-name-input" placeholder="Name" maxlength="60" />
           <div class="modal-actions">
             <button type="button" class="modal-btn" id="save-cancel-btn">Cancel</button>
@@ -70,7 +85,16 @@
 
       <div class="modal-overlay hidden" id="load-modal-overlay">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="load-modal-title">
-          <h2 id="load-modal-title">Load chord list</h2>
+          <div class="modal-header">
+            <h2 id="load-modal-title">Load pattern</h2>
+            <button type="button" class="modal-close-btn" id="load-close-btn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span class="visually-hidden">Close</span>
+            </button>
+          </div>
           <ul class="saved-list" id="saved-list"></ul>
           <div class="modal-actions">
             <button type="button" class="modal-btn" id="load-cancel-btn">Cancel</button>
@@ -80,7 +104,16 @@
 
       <div class="modal-overlay hidden" id="settings-modal-overlay">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
-          <h2 id="settings-modal-title">Settings</h2>
+          <div class="modal-header">
+            <h2 id="settings-modal-title">Settings</h2>
+            <button type="button" class="modal-close-btn" id="settings-close-btn">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span class="visually-hidden">Close</span>
+            </button>
+          </div>
 
           <div class="settings-field">
             <span class="settings-label">Mode</span>

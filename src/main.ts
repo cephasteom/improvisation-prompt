@@ -136,9 +136,12 @@ function applySettings(newSettings: ChordPatternSettings) {
 }
 
 function loadChordList(list: SavedChordList) {
-  if (list.prompts.length !== CARD_COUNT) return // guard against corrupted/edited storage
+  if (list.prompts.length !== list.settings.length) return // guard against corrupted/edited storage
 
   cancelSlide()
+  settings = list.settings
+  saveSettings(settings)
+  CARD_COUNT = settings.length
   prompts.splice(0, prompts.length, ...list.prompts)
   currentIndex = 0
   elapsedSeconds = 0
@@ -169,6 +172,7 @@ function dismissOnBackdropClick(overlayEl: HTMLElement) {
 const saveModalOverlay = document.querySelector<HTMLDivElement>('#save-modal-overlay')!
 const saveNameInput = document.querySelector<HTMLInputElement>('#save-name-input')!
 const saveCancelBtn = document.querySelector<HTMLButtonElement>('#save-cancel-btn')!
+const saveCloseBtn = document.querySelector<HTMLButtonElement>('#save-close-btn')!
 const saveConfirmBtn = document.querySelector<HTMLButtonElement>('#save-confirm-btn')!
 const saveBtn = document.querySelector<HTMLButtonElement>('#save-btn')!
 
@@ -179,13 +183,14 @@ saveBtn.addEventListener('click', () => {
 })
 
 saveCancelBtn.addEventListener('click', () => closeModal(saveModalOverlay))
+saveCloseBtn.addEventListener('click', () => closeModal(saveModalOverlay))
 dismissOnBackdropClick(saveModalOverlay)
 
 function confirmSave() {
   const name = saveNameInput.value.trim()
   if (!name) return
 
-  saveChordList(name, prompts)
+  saveChordList(name, prompts, settings)
   closeModal(saveModalOverlay)
 }
 
@@ -197,6 +202,7 @@ saveNameInput.addEventListener('keydown', (event) => {
 const loadModalOverlay = document.querySelector<HTMLDivElement>('#load-modal-overlay')!
 const savedListEl = document.querySelector<HTMLUListElement>('#saved-list')!
 const loadCancelBtn = document.querySelector<HTMLButtonElement>('#load-cancel-btn')!
+const loadCloseBtn = document.querySelector<HTMLButtonElement>('#load-close-btn')!
 const loadBtn = document.querySelector<HTMLButtonElement>('#load-btn')!
 
 function renderSavedList() {
@@ -206,7 +212,7 @@ function renderSavedList() {
   if (lists.length === 0) {
     const emptyEl = document.createElement('li')
     emptyEl.className = 'saved-list-empty'
-    emptyEl.textContent = 'No saved chord lists yet.'
+    emptyEl.textContent = 'No saved patterns yet.'
     savedListEl.appendChild(emptyEl)
     return
   }
@@ -245,11 +251,13 @@ loadBtn.addEventListener('click', () => {
 })
 
 loadCancelBtn.addEventListener('click', () => closeModal(loadModalOverlay))
+loadCloseBtn.addEventListener('click', () => closeModal(loadModalOverlay))
 dismissOnBackdropClick(loadModalOverlay)
 
 const settingsModalOverlay = document.querySelector<HTMLDivElement>('#settings-modal-overlay')!
 const settingsBtn = document.querySelector<HTMLButtonElement>('#settings-btn')!
 const settingsCancelBtn = document.querySelector<HTMLButtonElement>('#settings-cancel-btn')!
+const settingsCloseBtn = document.querySelector<HTMLButtonElement>('#settings-close-btn')!
 const settingsConfirmBtn = document.querySelector<HTMLButtonElement>('#settings-confirm-btn')!
 const modeChordBtn = document.querySelector<HTMLButtonElement>('#mode-chord-btn')!
 const modeScaleBtn = document.querySelector<HTMLButtonElement>('#mode-scale-btn')!
@@ -280,6 +288,7 @@ settingsBtn.addEventListener('click', () => {
 })
 
 settingsCancelBtn.addEventListener('click', () => closeModal(settingsModalOverlay))
+settingsCloseBtn.addEventListener('click', () => closeModal(settingsModalOverlay))
 dismissOnBackdropClick(settingsModalOverlay)
 
 function confirmSettings() {

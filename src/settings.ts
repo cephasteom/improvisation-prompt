@@ -1,6 +1,6 @@
 import type { PatternMode } from './chordPatternGenerator.ts'
 
-const STORAGE_KEY = 'improv-prompt:settings'
+const STORAGE_KEY = 'improvise:settings'
 
 export const MIN_LENGTH = 4
 export const MAX_LENGTH = 32
@@ -25,7 +25,7 @@ function isValidLength(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= MIN_LENGTH && value <= MAX_LENGTH
 }
 
-function isChordPatternSettings(value: unknown): value is ChordPatternSettings {
+export function isChordPatternSettings(value: unknown): value is ChordPatternSettings {
   return (
     typeof value === 'object' &&
     value !== null &&

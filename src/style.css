@@ -5,6 +5,11 @@ body {
   background: #000;
 }
 
+:focus-visible {
+  outline: 2px dashed #fff;
+  outline-offset: 2px;
+}
+
 #app {
   display: flex;
   align-items: center;
@@ -16,6 +21,7 @@ body {
   --card-w: clamp(160px, 32vw, 280px);
   --card-h: calc(var(--card-w) * 5 / 4); /* matches the .card aspect-ratio below */
   --gap: 16px;
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
 .stage {
@@ -50,7 +56,7 @@ body {
   border: 1px solid #333;
   border-radius: 12px;
   color: #fff;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(1.5rem, 5vw, 3rem);
   text-align: center;
   opacity: 1;
@@ -96,7 +102,7 @@ body {
   border-radius: 8px;
   background: transparent;
   color: #fff;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   cursor: pointer;
   display: flex;
@@ -151,18 +157,55 @@ body {
 .modal {
   width: min(320px, 90vw);
   box-sizing: border-box;
-  padding: 24px;
+  padding: 1.5rem;
   background: #111;
   border: 1px solid #333;
   border-radius: 12px;
   color: #fff;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-sans);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: -24px -24px 16px;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #333;
 }
 
 .modal h2 {
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+.modal-close-btn {
+  flex: 0 0 auto;
+  width: 2em;
+  height: 2em;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.modal-close-btn .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.modal-close-btn:hover {
+  background: #1a1a1a;
+  border-color: #888;
+  color: #fff;
 }
 
 .modal-input {
