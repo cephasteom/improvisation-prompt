@@ -34,12 +34,17 @@ function regenerate() {
 }
 
 function applySettings(newSettings: ChordPatternSettings) {
+  const shouldRegenerate = newSettings.mode !== settings.mode || newSettings.length !== settings.length
+
   settings = newSettings
   saveSettings(settings)
   CARD_COUNT = settings.length
   scheduler.setChangeEvery(settings.changeEvery)
   scheduler.setTempo(settings.tempo)
-  regenerate()
+
+  if (shouldRegenerate) {
+    regenerate()
+  }
 }
 
 function loadChordList(list: SavedChordList) {
