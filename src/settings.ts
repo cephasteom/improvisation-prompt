@@ -8,6 +8,9 @@ export const MAX_LENGTH = 32
 export const MIN_CHANGE_EVERY = 1
 export const MAX_CHANGE_EVERY = 64
 
+export const MIN_TEMPO = 40
+export const MAX_TEMPO = 240
+
 /** Unit the "change every" amount is counted in. */
 export type ChangeEveryUnit = 'beats' | 'bars'
 
@@ -24,12 +27,15 @@ export interface ChordPatternSettings {
   mode: PatternMode
   /** How often the active card advances. */
   changeEvery: ChangeEverySetting
+  /** Tone Transport tempo, in beats per minute. */
+  tempo: number
 }
 
 export const DEFAULT_SETTINGS: ChordPatternSettings = {
   length: 12,
   mode: 'chord',
   changeEvery: { amount: 4, unit: 'bars' },
+  tempo: 120,
 }
 
 function isPatternMode(value: unknown): value is PatternMode {
@@ -59,13 +65,18 @@ function isChangeEverySetting(value: unknown): value is ChangeEverySetting {
   )
 }
 
+function isValidTempo(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= MIN_TEMPO && value <= MAX_TEMPO
+}
+
 export function isChordPatternSettings(value: unknown): value is ChordPatternSettings {
   return (
     typeof value === 'object' &&
     value !== null &&
     isValidLength((value as ChordPatternSettings).length) &&
     isPatternMode((value as ChordPatternSettings).mode) &&
-    isChangeEverySetting((value as ChordPatternSettings).changeEvery)
+    isChangeEverySetting((value as ChordPatternSettings).changeEvery) &&
+    isValidTempo((value as ChordPatternSettings).tempo)
   )
 }
 

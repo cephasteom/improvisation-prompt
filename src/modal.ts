@@ -1,7 +1,7 @@
 import type { PatternMode } from './chordPatternGenerator.ts'
 import type { ChangeEveryUnit, ChordPatternSettings } from './settings.ts'
 import type { SavedChordList } from './storage.ts'
-import { MAX_CHANGE_EVERY, MAX_LENGTH, MIN_CHANGE_EVERY, MIN_LENGTH } from './settings.ts'
+import { MAX_CHANGE_EVERY, MAX_LENGTH, MAX_TEMPO, MIN_CHANGE_EVERY, MIN_LENGTH, MIN_TEMPO } from './settings.ts'
 
 // Base class for the app's overlay modals: show/hide plus dismissal by backdrop click. Subclasses
 // wire up their own controls and closing behavior on top of open()/close().
@@ -141,6 +141,7 @@ export class SettingsModal extends Modal {
   private readonly modeChordBtn: HTMLButtonElement
   private readonly modeScaleBtn: HTMLButtonElement
   private readonly lengthInput: HTMLInputElement
+  private readonly tempoInput: HTMLInputElement
   private readonly changeEveryInput: HTMLInputElement
   private readonly changeEveryBeatsBtn: HTMLButtonElement
   private readonly changeEveryBarsBtn: HTMLButtonElement
@@ -163,6 +164,7 @@ export class SettingsModal extends Modal {
     this.modeChordBtn = document.querySelector<HTMLButtonElement>('#mode-chord-btn')!
     this.modeScaleBtn = document.querySelector<HTMLButtonElement>('#mode-scale-btn')!
     this.lengthInput = document.querySelector<HTMLInputElement>('#length-input')!
+    this.tempoInput = document.querySelector<HTMLInputElement>('#tempo-input')!
     this.changeEveryInput = document.querySelector<HTMLInputElement>('#change-every-input')!
     this.changeEveryBeatsBtn = document.querySelector<HTMLButtonElement>('#change-every-beats-btn')!
     this.changeEveryBarsBtn = document.querySelector<HTMLButtonElement>('#change-every-bars-btn')!
@@ -190,6 +192,7 @@ export class SettingsModal extends Modal {
       this.pendingMode = settings.mode
       this.renderModeButtons()
       this.lengthInput.value = String(settings.length)
+      this.tempoInput.value = String(settings.tempo)
       this.pendingChangeEveryUnit = settings.changeEvery.unit
       this.renderChangeEveryButtons()
       this.changeEveryInput.value = String(settings.changeEvery.amount)
@@ -224,10 +227,16 @@ export class SettingsModal extends Modal {
       ? Math.min(MAX_CHANGE_EVERY, Math.max(MIN_CHANGE_EVERY, parsedChangeEveryAmount))
       : currentSettings.changeEvery.amount
 
+    const parsedTempo = Math.round(Number(this.tempoInput.value))
+    const tempo = Number.isFinite(parsedTempo)
+      ? Math.min(MAX_TEMPO, Math.max(MIN_TEMPO, parsedTempo))
+      : currentSettings.tempo
+
     this.deps.onApply({
       length,
       mode: this.pendingMode,
       changeEvery: { amount: changeEveryAmount, unit: this.pendingChangeEveryUnit },
+      tempo,
     })
     this.close()
   }

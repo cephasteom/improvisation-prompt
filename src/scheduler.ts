@@ -28,9 +28,10 @@ export class Scheduler {
   private readonly metronomeSynth: Synth
   private readonly metronomeLoop: Loop
 
-  constructor(callbacks: SchedulerCallbacks, changeEvery: ChangeEverySetting) {
+  constructor(callbacks: SchedulerCallbacks, changeEvery: ChangeEverySetting, tempo: number) {
     this.callbacks = callbacks
     this.advanceLoop = this.createAdvanceLoop(changeEvery)
+    getTransport().bpm.value = tempo
 
     this.metronomeSynth = new Synth({
       oscillator: { type: 'sine' },
@@ -62,6 +63,12 @@ export class Scheduler {
   // Mutes/unmutes the metronome click without affecting the advance cycle.
   setMetronomeEnabled(enabled: boolean): void {
     this.metronomeLoop.mute = !enabled
+  }
+
+  // Updates the Transport's tempo (beats per minute). Since the advance/metronome loops are
+  // expressed in beats/bars, this speeds up or slows down both without needing to be recreated.
+  setTempo(tempo: number): void {
+    getTransport().bpm.value = tempo
   }
 
   // Resumes the audio context (must run from a user gesture) and starts the transport.

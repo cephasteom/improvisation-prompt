@@ -38,6 +38,7 @@ function applySettings(newSettings: ChordPatternSettings) {
   saveSettings(settings)
   CARD_COUNT = settings.length
   scheduler.setChangeEvery(settings.changeEvery)
+  scheduler.setTempo(settings.tempo)
   regenerate()
 }
 
@@ -49,6 +50,7 @@ function loadChordList(list: SavedChordList) {
   CARD_COUNT = settings.length
   prompts.splice(0, prompts.length, ...list.prompts)
   scheduler.setChangeEvery(settings.changeEvery)
+  scheduler.setTempo(settings.tempo)
   scheduler.reset()
   slider.reset(prompts, CARD_COUNT)
 }
@@ -92,7 +94,11 @@ function updatePlayStopButton() {
   playStopBtn.title = label
 }
 
-const scheduler = new Scheduler({ onAdvance: () => slider.advance(prompts, CARD_COUNT) }, settings.changeEvery)
+const scheduler = new Scheduler(
+  { onAdvance: () => slider.advance(prompts, CARD_COUNT) },
+  settings.changeEvery,
+  settings.tempo,
+)
 
 playStopBtn.addEventListener('click', () => {
   isPlaying = !isPlaying
@@ -110,6 +116,8 @@ if (isPlaying) void scheduler.start()
 
 // Metronome: off by default, toggled independently of play/stop.
 const metronomeBtn = document.querySelector<HTMLButtonElement>('#metronome-btn')!
+const speakerOnIconEl = metronomeBtn.querySelector<SVGElement>('.icon-speaker-on')!
+const speakerOffIconEl = metronomeBtn.querySelector<SVGElement>('.icon-speaker-off')!
 const metronomeLabelEl = document.querySelector<HTMLSpanElement>('#metronome-label')!
 let metronomeEnabled = false
 
@@ -117,6 +125,8 @@ function updateMetronomeButton() {
   const label = metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'
   metronomeBtn.classList.toggle('active', metronomeEnabled)
   metronomeBtn.setAttribute('aria-pressed', String(metronomeEnabled))
+  speakerOnIconEl.classList.toggle('hidden', !metronomeEnabled)
+  speakerOffIconEl.classList.toggle('hidden', metronomeEnabled)
   metronomeLabelEl.textContent = label
   metronomeBtn.title = label
 }
