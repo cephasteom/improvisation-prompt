@@ -24,6 +24,14 @@
           </svg>
           <span class="visually-hidden" id="play-stop-label">Stop</span>
         </button>
+        <button type="button" class="sidebar-btn" id="metronome-btn" title="Turn metronome on" aria-pressed="false">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <polygon points="12 3 18 21 6 21"></polygon>
+            <line x1="12" y1="8" x2="9" y2="18"></line>
+            <circle cx="9" cy="18" r="1" fill="currentColor" stroke="none"></circle>
+          </svg>
+          <span class="visually-hidden" id="metronome-label">Turn metronome on</span>
+        </button>
         <button type="button" class="sidebar-btn" id="regenerate-btn" title="Regenerate">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
             <polyline points="23 4 23 10 17 10"></polyline>
@@ -126,6 +134,24 @@
           <div class="settings-field">
             <label class="settings-label" for="length-input">Pattern length</label>
             <input type="number" class="modal-input" id="length-input" min="4" max="32" step="1" />
+          </div>
+
+          <div class="settings-field">
+            <span class="settings-label">Change every</span>
+            <div class="settings-field-row">
+              <input
+                type="number"
+                class="modal-input modal-input-inline"
+                id="change-every-input"
+                min="1"
+                max="64"
+                step="1"
+              />
+              <div class="segmented-control" id="change-every-unit-control" role="radiogroup" aria-label="Change every unit">
+                <button type="button" class="segmented-btn" id="change-every-beats-btn" role="radio">Beats</button>
+                <button type="button" class="segmented-btn" id="change-every-bars-btn" role="radio">Bars</button>
+              </div>
+            </div>
           </div>
 
           <div class="modal-actions">

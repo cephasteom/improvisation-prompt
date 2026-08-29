@@ -4,10 +4,8 @@ import { deleteChordList, getSavedChordLists, saveChordList, type SavedChordList
 import { getSettings, saveSettings, type ChordPatternSettings } from './settings.ts'
 import { Slider } from './slider.ts'
 import { LoadModal, SaveModal, SettingsModal } from './modal.ts'
+import { Scheduler } from './scheduler.ts'
 
-const CYCLE_SECONDS = 16
-const FLASH_START_SECOND = CYCLE_SECONDS - 3
-const FLASH_DURATION_MS = 150
 const SIDEBAR_HIDE_DELAY_MS = 4000
 
 const chordPatternGenerator = new ChordPatternGenerator()
@@ -25,13 +23,13 @@ const slider = new Slider(trackEl)
 slider.reset(prompts, CARD_COUNT)
 
 function resetToFirstCard() {
-  elapsedSeconds = 0
+  scheduler.reset()
   slider.reset(prompts, CARD_COUNT)
 }
 
 function regenerate() {
   prompts.splice(0, prompts.length, ...chordPatternGenerator.generate({ length: CARD_COUNT, mode: settings.mode }))
-  elapsedSeconds = 0
+  scheduler.reset()
   slider.reset(prompts, CARD_COUNT)
 }
 
@@ -39,6 +37,7 @@ function applySettings(newSettings: ChordPatternSettings) {
   settings = newSettings
   saveSettings(settings)
   CARD_COUNT = settings.length
+  scheduler.setChangeEvery(settings.changeEvery)
   regenerate()
 }
 
@@ -49,7 +48,8 @@ function loadChordList(list: SavedChordList) {
   saveSettings(settings)
   CARD_COUNT = settings.length
   prompts.splice(0, prompts.length, ...list.prompts)
-  elapsedSeconds = 0
+  scheduler.setChangeEvery(settings.changeEvery)
+  scheduler.reset()
   slider.reset(prompts, CARD_COUNT)
 }
 
@@ -92,34 +92,55 @@ function updatePlayStopButton() {
   playStopBtn.title = label
 }
 
+const scheduler = new Scheduler({ onAdvance: () => slider.advance(prompts, CARD_COUNT) }, settings.changeEvery)
+
 playStopBtn.addEventListener('click', () => {
   isPlaying = !isPlaying
   updatePlayStopButton()
 
-  if (!isPlaying) {
+  if (isPlaying) {
+    void scheduler.start()
+  } else {
+    scheduler.stop()
     resetToFirstCard()
   }
 })
 
-let elapsedSeconds = 0
+if (isPlaying) void scheduler.start()
 
-setInterval(() => {
-  if (!isPlaying) return
+// Metronome: off by default, toggled independently of play/stop.
+const metronomeBtn = document.querySelector<HTMLButtonElement>('#metronome-btn')!
+const metronomeLabelEl = document.querySelector<HTMLSpanElement>('#metronome-label')!
+let metronomeEnabled = false
 
-  elapsedSeconds++
+function updateMetronomeButton() {
+  const label = metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'
+  metronomeBtn.classList.toggle('active', metronomeEnabled)
+  metronomeBtn.setAttribute('aria-pressed', String(metronomeEnabled))
+  metronomeLabelEl.textContent = label
+  metronomeBtn.title = label
+}
 
-  if (elapsedSeconds >= CYCLE_SECONDS) {
-    slider.advance(prompts, CARD_COUNT)
-    elapsedSeconds = 0
-    return
-  }
+metronomeBtn.addEventListener('click', () => {
+  metronomeEnabled = !metronomeEnabled
+  scheduler.setMetronomeEnabled(metronomeEnabled)
+  updateMetronomeButton()
+})
 
-  if (elapsedSeconds >= FLASH_START_SECOND) {
-    const activeEl = slider.activeCardEl
-    activeEl.classList.add('flash')
-    setTimeout(() => activeEl.classList.remove('flash'), FLASH_DURATION_MS)
-  }
-}, 1000)
+updateMetronomeButton()
+
+// Browsers only let an audio context resume from within a genuine user gesture, so a
+// scheduler.start() called on page load (above) may sit waiting for one. Retry on the first
+// interaction; scheduler.start()/Transport.start() are both no-ops once already running/started.
+for (const eventName of ['pointerdown', 'keydown']) {
+  window.addEventListener(
+    eventName,
+    () => {
+      if (isPlaying) void scheduler.start()
+    },
+    { once: true },
+  )
+}
 
 // Sidebar: visible on load, hides after a few seconds of inactivity, and reappears on any
 // mouse/touch activity.

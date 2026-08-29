@@ -1,7 +1,7 @@
 import type { PatternMode } from './chordPatternGenerator.ts'
-import type { ChordPatternSettings } from './settings.ts'
+import type { ChangeEveryUnit, ChordPatternSettings } from './settings.ts'
 import type { SavedChordList } from './storage.ts'
-import { MAX_LENGTH, MIN_LENGTH } from './settings.ts'
+import { MAX_CHANGE_EVERY, MAX_LENGTH, MIN_CHANGE_EVERY, MIN_LENGTH } from './settings.ts'
 
 // Base class for the app's overlay modals: show/hide plus dismissal by backdrop click. Subclasses
 // wire up their own controls and closing behavior on top of open()/close().
@@ -141,15 +141,20 @@ export class SettingsModal extends Modal {
   private readonly modeChordBtn: HTMLButtonElement
   private readonly modeScaleBtn: HTMLButtonElement
   private readonly lengthInput: HTMLInputElement
+  private readonly changeEveryInput: HTMLInputElement
+  private readonly changeEveryBeatsBtn: HTMLButtonElement
+  private readonly changeEveryBarsBtn: HTMLButtonElement
   private readonly deps: SettingsModalDeps
 
-  // Mode selected in the (still-open, unsaved) modal.
+  // Mode/unit selected in the (still-open, unsaved) modal.
   private pendingMode: PatternMode
+  private pendingChangeEveryUnit: ChangeEveryUnit
 
   constructor(deps: SettingsModalDeps) {
     super(document.querySelector<HTMLDivElement>('#settings-modal-overlay')!)
     this.deps = deps
     this.pendingMode = deps.getSettings().mode
+    this.pendingChangeEveryUnit = deps.getSettings().changeEvery.unit
 
     const openBtn = document.querySelector<HTMLButtonElement>('#settings-btn')!
     const cancelBtn = document.querySelector<HTMLButtonElement>('#settings-cancel-btn')!
@@ -158,6 +163,9 @@ export class SettingsModal extends Modal {
     this.modeChordBtn = document.querySelector<HTMLButtonElement>('#mode-chord-btn')!
     this.modeScaleBtn = document.querySelector<HTMLButtonElement>('#mode-scale-btn')!
     this.lengthInput = document.querySelector<HTMLInputElement>('#length-input')!
+    this.changeEveryInput = document.querySelector<HTMLInputElement>('#change-every-input')!
+    this.changeEveryBeatsBtn = document.querySelector<HTMLButtonElement>('#change-every-beats-btn')!
+    this.changeEveryBarsBtn = document.querySelector<HTMLButtonElement>('#change-every-bars-btn')!
 
     this.modeChordBtn.addEventListener('click', () => {
       this.pendingMode = 'chord'
@@ -168,11 +176,23 @@ export class SettingsModal extends Modal {
       this.renderModeButtons()
     })
 
+    this.changeEveryBeatsBtn.addEventListener('click', () => {
+      this.pendingChangeEveryUnit = 'beats'
+      this.renderChangeEveryButtons()
+    })
+    this.changeEveryBarsBtn.addEventListener('click', () => {
+      this.pendingChangeEveryUnit = 'bars'
+      this.renderChangeEveryButtons()
+    })
+
     openBtn.addEventListener('click', () => {
       const settings = this.deps.getSettings()
       this.pendingMode = settings.mode
       this.renderModeButtons()
       this.lengthInput.value = String(settings.length)
+      this.pendingChangeEveryUnit = settings.changeEvery.unit
+      this.renderChangeEveryButtons()
+      this.changeEveryInput.value = String(settings.changeEvery.amount)
       this.open()
     })
 
@@ -186,14 +206,29 @@ export class SettingsModal extends Modal {
     this.modeScaleBtn.setAttribute('aria-checked', String(this.pendingMode === 'scale'))
   }
 
+  private renderChangeEveryButtons() {
+    this.changeEveryBeatsBtn.setAttribute('aria-checked', String(this.pendingChangeEveryUnit === 'beats'))
+    this.changeEveryBarsBtn.setAttribute('aria-checked', String(this.pendingChangeEveryUnit === 'bars'))
+  }
+
   private confirmSettings() {
-    const currentLength = this.deps.getSettings().length
+    const currentSettings = this.deps.getSettings()
+
     const parsedLength = Math.round(Number(this.lengthInput.value))
     const length = Number.isFinite(parsedLength)
       ? Math.min(MAX_LENGTH, Math.max(MIN_LENGTH, parsedLength))
-      : currentLength
+      : currentSettings.length
 
-    this.deps.onApply({ length, mode: this.pendingMode })
+    const parsedChangeEveryAmount = Math.round(Number(this.changeEveryInput.value))
+    const changeEveryAmount = Number.isFinite(parsedChangeEveryAmount)
+      ? Math.min(MAX_CHANGE_EVERY, Math.max(MIN_CHANGE_EVERY, parsedChangeEveryAmount))
+      : currentSettings.changeEvery.amount
+
+    this.deps.onApply({
+      length,
+      mode: this.pendingMode,
+      changeEvery: { amount: changeEveryAmount, unit: this.pendingChangeEveryUnit },
+    })
     this.close()
   }
 }

@@ -69,10 +69,6 @@ body {
   filter: brightness(0.5);
 }
 
-.card.flash {
-  opacity: 0;
-}
-
 .sidebar {
   position: fixed;
   inset: 0 auto 0 0;
@@ -114,6 +110,17 @@ body {
 .sidebar-btn:hover {
   background: #1a1a1a;
   border-color: #888;
+}
+
+.sidebar-btn.active {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+.sidebar-btn.active:hover {
+  background: #ddd;
+  border-color: #ddd;
 }
 
 .icon {
@@ -324,6 +331,21 @@ body {
   margin-bottom: 8px;
   color: #aaa;
   font-size: 0.85rem;
+}
+
+.settings-field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-input-inline {
+  width: 5em;
+  flex: none;
+  margin-bottom: 0;
+}
+
+.settings-field-row .segmented-control {
+  flex: 1;
 }
 
 .segmented-control {
